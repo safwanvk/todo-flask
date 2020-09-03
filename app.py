@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import redirect
 
-
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todo.sqlite"
 db = SQLAlchemy(app)
@@ -24,6 +23,17 @@ def index():
     else:
         todo = Todo.query.all()
         return render_template('index.html', todos=todo)
+
+
+@app.route('/edit/<id>/', methods=['GET', 'POST'])
+def edit(id):
+    todo = Todo.query.get(id)
+    if request.method == 'POST':
+        todo.title = request.form['title']
+        db.session.commit()
+        return redirect('/')
+    else:
+        return render_template('edit.html', todo=todo)
 
 
 if __name__ == "__main__":
